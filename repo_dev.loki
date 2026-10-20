@@ -1,0 +1,23 @@
+# frozen_string_literal: true
+# Project-level component tasks for the SmartMessage repos.
+#
+# Pulls in the shared MadBomber-level per-component tasks (DRY: one source of
+# truth in madbomber/dev/) and is itself imported by each repo's .loki via
+# `import_up`. Each file is named explicitly (rather than a fixed ../dev
+# path) so this keeps working no matter how deeply the project is nested
+# under madbomber/ — `import_up` walks up from the component until it finds
+# each one. quality_rails.loki is imported only when RAILS_ROOT is set.
+# asgard runs as a separate process outside the app it's checking, so
+# `defined?(Rails)` never sees the app's Rails constant — RAILS_ROOT is set
+# in a Rails repo's own .envrc (`export RAILS_ROOT=$RR`, after RR is
+# defined) as the signal instead.
+#
+# Add SmartMessage-project-specific component overrides below the import; a
+# task defined here (or in a repo's own .loki) overrides the shared one.
+
+import_up "dev/quality.loki"
+import_up "dev/quality_rails.loki" if ENV["RAILS_ROOT"]
+import_up "dev/git.loki"
+import_up "dev/iterm_tasks.loki"
+import_up "dev/doc_tasks.loki"
+import_up "dev/gem_tasks.loki"

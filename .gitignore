@@ -1,0 +1,9 @@
+# Sub-repos: each is an independent git repo with its own GitHub remote.
+/smart_message/
+/smart_message-transport-*/
+/smart_message_demos/
+
+.bundle_mode
+.DS_Store
+
+/smart_message-*/

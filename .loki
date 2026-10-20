@@ -1,0 +1,30 @@
+# frozen_string_literal: true
+# SmartMessage workspace — entry point. Run `asgard help` for available tasks.
+#
+# Pulls in the shared cross-project toolkit from projects/workspace/ (repo
+# lists, @@core, git/quality/gems/sync/overview tasks). ws_repos is loaded
+# first so @@core/@@repos are defined before the other modules reference them.
+# ws_repos auto-derives everything from the filesystem: core = smart_message,
+# extensions = the smart_message-transport-* gems whose gemspecs depend on
+# smart_message (rabbitmq is left out until its gemspec declares that
+# dependency).
+
+import_up "workspace/ws_repos.loki"
+import_up "workspace/*.loki"
+
+class Tasks
+  # smart_message_demos carries no gemspec so it never appears in @@gems, but
+  # it is the workspace's only application. Everything in @@gems is a library.
+  @@apps ||= %w( smart_message_demos ).freeze
+  @@libs ||= @@gems.reject { @@apps.include?(_1) }.freeze
+
+  helper(:workspace_version) do
+    file = Dir.glob("#{@@core}/lib/**/version.rb").first
+    file ? File.read(file)[/VERSION\s*=\s*['"]([^'"]+)['"]/, 1] : "?.?.?" rescue "?.?.?"
+  end
+
+  header "SmartMessage Workspace v#{workspace_version} — #{@@gems.size} gems + #{(@@repos - @@gems).size} app(s)"
+  footer "Run `asgard help <task>` for usage details"
+
+  default_task :check
+end
